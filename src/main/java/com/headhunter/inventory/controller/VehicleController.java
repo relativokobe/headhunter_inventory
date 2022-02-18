@@ -3,6 +3,7 @@ package com.headhunter.inventory.controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.headhunter.inventory.dto.VehicleDto;
+import com.headhunter.inventory.entity.Vehicle;
 import com.headhunter.inventory.enums.ResponseEnum;
 import com.headhunter.inventory.model.ValidatorResponse;
 import com.headhunter.inventory.service.VehicleService;
@@ -71,5 +72,29 @@ public class VehicleController {
         final String stringResponse = gson.toJson(vehicles);
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(stringResponse);
+    }
+
+    @PatchMapping("/vehicle")
+    public void updateVehicle(final @RequestBody VehicleDto vehicleDto, final HttpServletResponse response) throws IOException {
+        final ValidatorResponse validatorResponse = VehicleValidator.validateParams(vehicleDto);
+        if(!validatorResponse.getCode().equals(ResponseEnum.VALIDATION_SUCCESSFUL.getCode())){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write(validatorResponse.getDescription());
+            return;
+        }
+
+        final Vehicle vehicle = vehicleService.findByInventoryCode(vehicleDto.getInventoryCode());
+        //Inventory Code Does not exists
+        if(vehicle == null){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write(ResponseEnum.INVENTORY_CODE_DOES_NOT_EXISTS.getDescription());
+            return;
+        }
+
+        vehicle.setModel(vehicleDto.getModel());
+        vehicle.setName(vehicleDto.getName());
+        vehicle.setColor(vehicleDto.getColor());
+        vehicleService.updateVehicle(vehicle);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
