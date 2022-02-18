@@ -50,6 +50,10 @@ public class VehicleService {
         return vehicles.getContent();
     }
 
+    public void deleteVehicle(final Vehicle vehicle){
+        vehicleRepository.delete(vehicle);
+    }
+
     private String vehicleIdGenerator(){
         String proposedVehicleId = null;
         boolean vehicleIdExists = true;
