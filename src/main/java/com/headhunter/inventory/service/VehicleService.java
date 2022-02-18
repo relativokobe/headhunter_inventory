@@ -31,6 +31,10 @@ public class VehicleService {
         vehicleRepository.save(vehicle);
     }
 
+    public void updateVehicle(final Vehicle vehicle){
+        vehicleRepository.save(vehicle);
+    }
+
     public List<Vehicle> getAllVehicles(final int pageStart, final int pageEnd, final String sortBy){
         if(StringUtils.isEmpty(sortBy)){
             return vehicleRepository.findAll();
