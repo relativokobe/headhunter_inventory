@@ -28,6 +28,7 @@ public class VehicleController {
     private static final String SORT_BY_PARAM = "sortBy";
     private static final String PAGE_START_PARAM = "pageStart";
     private static final String PAGE_END_PARAM = "pageEnd";
+    private static final String INVENTORY_CODE = "inventoryCode";
 
     @PostMapping("/vehicle")
     public void insertNewVehicle(final @RequestBody VehicleDto vehicleDto, final HttpServletResponse response) throws IOException {
@@ -95,6 +96,26 @@ public class VehicleController {
         vehicle.setName(vehicleDto.getName());
         vehicle.setColor(vehicleDto.getColor());
         vehicleService.updateVehicle(vehicle);
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @DeleteMapping("/vehicle")
+    public void deleteVehicle(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        final String inventoryCode = request.getParameter(INVENTORY_CODE);
+        if(StringUtils.isEmpty(inventoryCode)){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write(ResponseEnum.INVENTORY_CODE_EMPTY.getDescription());
+            return;
+        }
+
+        final Vehicle vehicle = vehicleService.findByInventoryCode(inventoryCode);
+        if(vehicle == null){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write(ResponseEnum.INVENTORY_CODE_DOES_NOT_EXISTS.getDescription());
+            return;
+        }
+
+        vehicleService.deleteVehicle(vehicle);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
